@@ -1,0 +1,1 @@
+ALTER TABLE conversation ALTER COLUMN session_key TYPE varchar(2048);
