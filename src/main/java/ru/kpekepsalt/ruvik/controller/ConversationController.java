@@ -15,8 +15,8 @@ import ru.kpekepsalt.ruvik.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.apache.commons.lang3.ObjectUtils.compare;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 @RestController
@@ -64,24 +64,18 @@ public class ConversationController {
         if(isEmpty(login)) {
             return ResponseEntity.badRequest().build();
         }
-        User user = userService.findByLogin(login);
-        if(isEmpty(user)) {
-            return ResponseEntity.notFound().build();
-        }
-        Conversation conversation = conversationService.findByReceiverIdAndSenderId(userDetailsService.getUserid(), user.getId());
-        if(!isEmpty(conversation)) {
-            return ResponseEntity.status(HttpStatus.FOUND).build();
-        }
-        conversation = new Conversation();
-        conversation.setSessionKey(sessionInitialInformationDto.getEncryptedSessionKey());
-        conversation.setOneTimeKey(sessionInitialInformationDto.getOneTImeKey());
-        conversation.setReceiverId(user.getId());
-        conversation.setSenderId(userDetailsService.getUserid());
-        conversation.setStatus(ConversationStatus.PENDING);
-        conversationService.save(conversation);
-        conversation = conversationService.findBySession(conversation.getSessionKey());
-        ConversationDto dto = new ConversationDto(conversation);
-        return ResponseEntity.ok(dto);
+        AtomicReference<ResponseEntity<ConversationDto>> response = new AtomicReference<>();
+        conversationService.initiate(login, sessionInitialInformationDto,
+                () -> response.set(
+                        ResponseEntity.notFound().build()
+                ),
+                () -> response.set(
+                        ResponseEntity.status(HttpStatus.FOUND).build()
+                ),
+                conversation -> response.set(
+                        ResponseEntity.ok(conversation)
+                ));
+        return response.get();
     }
 
     @PostMapping("/initiate/accept")

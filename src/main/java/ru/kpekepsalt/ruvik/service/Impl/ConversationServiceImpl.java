@@ -1,13 +1,24 @@
 package ru.kpekepsalt.ruvik.service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import ru.kpekepsalt.ruvik.dto.ConversationDto;
+import ru.kpekepsalt.ruvik.dto.SessionInitialInformationDto;
+import ru.kpekepsalt.ruvik.functional.VoidActionFunctional;
+import ru.kpekepsalt.ruvik.functional.VoidParamActionFunctional;
 import ru.kpekepsalt.ruvik.model.Conversation;
 import ru.kpekepsalt.ruvik.model.ConversationStatus;
+import ru.kpekepsalt.ruvik.model.User;
 import ru.kpekepsalt.ruvik.repository.ConversationRepository;
 import ru.kpekepsalt.ruvik.service.ConversationService;
+import ru.kpekepsalt.ruvik.service.UserService;
 
 import java.util.List;
+
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 @Service
 public class ConversationServiceImpl implements ConversationService {
@@ -15,9 +26,15 @@ public class ConversationServiceImpl implements ConversationService {
     @Autowired
     private ConversationRepository conversationRepository;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
     @Override
-    public void save(Conversation conversation) {
-        conversationRepository.save(conversation);
+    public Conversation save(Conversation conversation) {
+        return conversationRepository.save(conversation);
     }
 
     @Override
@@ -58,5 +75,32 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public void establishSession(Long id) {
         conversationRepository.establishSession(ConversationStatus.ESTABLISHED, id);
+    }
+
+    public void initiate(String login, SessionInitialInformationDto sessionInitialInformationDto,
+                         VoidActionFunctional userNotFound,
+                         VoidActionFunctional alreadyInitiated,
+                         VoidParamActionFunctional<ConversationDto> onSuccess)
+    {
+        User user = userService.findByLogin(login);
+        if(isEmpty(user)) {
+            userNotFound.action();
+            return;
+        }
+        Conversation conversation = findByReceiverIdAndSenderId(userDetailsService.getUserid(), user.getId());
+        if(!isEmpty(conversation)) {
+            alreadyInitiated.action();
+            return;
+        }
+        conversation = new Conversation();
+        conversation.setSessionKey(sessionInitialInformationDto.getEncryptedSessionKey());
+        conversation.setOneTimeKey(sessionInitialInformationDto.getOneTImeKey());
+        conversation.setReceiverId(user.getId());
+        conversation.setSenderId(userDetailsService.getUserid());
+        conversation.setStatus(ConversationStatus.PENDING);
+        save(conversation);
+        conversation = findBySession(conversation.getSessionKey());
+        ConversationDto dto = new ConversationDto(conversation);
+        onSuccess.action(dto);
     }
 }

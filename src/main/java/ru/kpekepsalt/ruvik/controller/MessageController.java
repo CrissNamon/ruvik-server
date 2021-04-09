@@ -1,19 +1,13 @@
 package ru.kpekepsalt.ruvik.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import ru.kpekepsalt.ruvik.dto.*;
-import ru.kpekepsalt.ruvik.functional.Functional;
 import ru.kpekepsalt.ruvik.functional.VoidActionFunctional;
-import ru.kpekepsalt.ruvik.functional.VoidParamActionFunctional;
 import ru.kpekepsalt.ruvik.functional.VoidParamsActionFunctional;
 import ru.kpekepsalt.ruvik.model.Conversation;
 import ru.kpekepsalt.ruvik.model.Message;
@@ -23,7 +17,6 @@ import ru.kpekepsalt.ruvik.service.MessageService;
 import ru.kpekepsalt.ruvik.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
