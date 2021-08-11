@@ -8,3 +8,15 @@ Server app for **Ruvik** messenger, uses:
 
 **WARNING**
 <br>WIP, not intend to use in real project
+
+<br>To run in docker container use command:
+<br>
+<code>
+docker-compose up -d
+</code>
+
+<br>To rebuild project in container use:
+<br>
+<code>
+    docker-compose build
+</code>
