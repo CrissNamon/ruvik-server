@@ -1,5 +1,9 @@
 package ru.kpekepsalt.ruvik.dto;
 
+import ru.kpekepsalt.ruvik.enums.NetworkAction;
+import ru.kpekepsalt.ruvik.enums.NetworkOrigin;
+import ru.kpekepsalt.ruvik.enums.NetworkStatus;
+
 public class NetworkMessageDto {
 
     private NetworkAction networkAction;

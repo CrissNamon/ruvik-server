@@ -1,4 +1,4 @@
-package ru.kpekepsalt.ruvik.dto;
+package ru.kpekepsalt.ruvik.enums;
 
 public enum NetworkAction {
     CONNECT,

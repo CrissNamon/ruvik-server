@@ -1,16 +1,17 @@
 package ru.kpekepsalt.ruvik.service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
+import ru.kpekepsalt.ruvik.Utils.CipherUtils;
 import ru.kpekepsalt.ruvik.dto.UserDto;
-import ru.kpekepsalt.ruvik.model.AppUserDetails;
 import ru.kpekepsalt.ruvik.model.User;
 import ru.kpekepsalt.ruvik.repository.UserRepository;
 import ru.kpekepsalt.ruvik.service.UserService;
 
+/**
+ * Service for user profile operations
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -34,11 +35,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(User user) {
         userRepository.save(user);
-    }
-
-    @Override
-    public User findByLoginAndPassword(String login, String password) {
-        return userRepository.findByLoginAndPassword(login, password).orElse(null);
     }
 
     @Override

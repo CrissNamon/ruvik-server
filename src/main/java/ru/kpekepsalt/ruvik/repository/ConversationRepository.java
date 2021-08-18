@@ -21,6 +21,12 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     List<Conversation> findByStatusAndReceiverId(ConversationStatus status, Long id);
     List<Conversation> findByStatusAndSenderId(ConversationStatus status, Long id);
     Optional<Conversation> findByReceiverIdAndSenderId(Long receiver, Long sender);
+
+    /**
+     * Session establishment
+     * @param status New conversation status
+     * @param id Conversation id
+     */
     @Modifying
     @Transactional
     @Query("UPDATE Conversation c SET c.oneTimeKey = '', c.status = :status WHERE id = :id")

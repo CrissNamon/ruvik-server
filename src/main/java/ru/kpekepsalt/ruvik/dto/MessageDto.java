@@ -1,8 +1,8 @@
 package ru.kpekepsalt.ruvik.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ru.kpekepsalt.ruvik.model.Message;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MessageDto {
@@ -15,6 +15,18 @@ public class MessageDto {
     private LocalDateTime time;
     private Long messageId;
     private Long localId;
+
+    public MessageDto(){}
+
+    public MessageDto(Message message)
+    {
+        setMessageId(message.getId());
+        setTime(message.getTime());
+        setSenderLogin(message.getSenderLogin());
+        setUserId(message.getUserId());
+        setConversationId(message.getConversationId());
+        setText(message.getText());
+    }
 
     public String getText() {
         return text;

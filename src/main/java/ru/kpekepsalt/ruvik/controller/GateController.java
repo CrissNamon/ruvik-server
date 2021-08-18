@@ -16,6 +16,9 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static ru.kpekepsalt.ruvik.Urls.API_PATH;
 import static ru.kpekepsalt.ruvik.Utils.ValidationUtils.isValid;
 
+/**
+ * Controller for user account authorization
+ */
 @RestController
 @RequestMapping(API_PATH+ Urls.GATE.END_POINT)
 public class GateController {
@@ -23,6 +26,9 @@ public class GateController {
     @Autowired
     private UserService userService;
 
+    /**
+     * @return User information
+     */
     @GetMapping("/auth")
     public ResponseEntity<UserDto> authUserByLogin() {
         if(!userService.isAuth()) {
@@ -35,10 +41,14 @@ public class GateController {
         return ResponseEntity.ok(dto);
     }
 
+    /**
+     * @param token User token for authorization
+     * @return User information
+     */
     @GetMapping("/auth/{token}")
-    public ResponseEntity<User> authUserByToken(@Valid @NotNull @PathVariable("token") String token) {
+    public ResponseEntity<UserDto> authUserByToken(@Valid @NotNull @PathVariable("token") String token) {
         if(isEmpty(token)) {
-            return ResponseEntity.badRequest().body(new User());
+            return ResponseEntity.badRequest().build();
         }
         User user = userService.findByToken(token);
         if(isEmpty(user)) {
@@ -47,11 +57,16 @@ public class GateController {
         User update = userService.updateUser(user);
         update.setOldDatabaseKey(user.getDatabaseKey());
         userService.save(update);
-        return ResponseEntity.ok(update);
+        UserDto userDto = new UserDto(update);
+        return ResponseEntity.ok(userDto);
     }
 
+    /**
+     * @param userDto User information to register
+     * @return Registered user information
+     */
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@NotNull @Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> registerUser(@NotNull @Valid @RequestBody UserDto userDto) {
         if(isValid(userDto)) {
             return ResponseEntity.badRequest().build();
         }
@@ -61,7 +76,8 @@ public class GateController {
         }
         user = userService.createUser(userDto);
         userService.save(user);
-         return ResponseEntity.ok(user);
+        UserDto response = new UserDto(user);
+        return ResponseEntity.ok(response);
     }
 
 }

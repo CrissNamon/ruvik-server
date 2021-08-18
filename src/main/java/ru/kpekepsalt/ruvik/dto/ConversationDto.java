@@ -3,11 +3,7 @@ package ru.kpekepsalt.ruvik.dto;
 import ru.kpekepsalt.ruvik.model.Conversation;
 import ru.kpekepsalt.ruvik.model.ConversationStatus;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
-public class ConversationDto {
+public class ConversationDto{
     private Long conversationId;
     private String sessionKey;
     private Long receiverId;

@@ -7,6 +7,9 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 import ru.kpekepsalt.ruvik.dto.*;
+import ru.kpekepsalt.ruvik.enums.NetworkAction;
+import ru.kpekepsalt.ruvik.enums.NetworkOrigin;
+import ru.kpekepsalt.ruvik.enums.NetworkStatus;
 import ru.kpekepsalt.ruvik.functional.VoidActionFunctional;
 import ru.kpekepsalt.ruvik.functional.VoidParamsActionFunctional;
 import ru.kpekepsalt.ruvik.model.Conversation;
@@ -20,6 +23,9 @@ import java.time.LocalDateTime;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
+/**
+ * Controller for realtime messaging using STOMP over Websocket
+ */
 @RestController
 public class MessageController {
 
@@ -35,6 +41,10 @@ public class MessageController {
     @Autowired
     private UserService userService;
 
+    /**
+     * @param networkMessageDto Incoming message information
+     * @param token User token
+     */
     @MessageMapping("/send")
     public void processMessage(@Payload NetworkMessageDto networkMessageDto, @Header("Authorization") String token) {
         User user = userService.findByToken(token);
@@ -51,10 +61,7 @@ public class MessageController {
                         networkMessageDto.getData(),
                         (message, conversation) -> {
                             Long localId = networkMessageDto.getData().getLocalId();
-                            MessageDto sentMessage = new MessageDto();
-                            sentMessage.setMessageId(message.getId());
-                            sentMessage.setConversationId(message.getConversationId());
-                            sentMessage.setText(message.getText());
+                            MessageDto sentMessage = new MessageDto(message);
                             sentMessage.setUserId(networkMessageDto.getData().getUserId());
                             sentMessage.setSenderLogin(networkMessageDto.getData().getSenderLogin());
                             sentMessage.setTime(LocalDateTime.now());
@@ -89,7 +96,8 @@ public class MessageController {
         }
     }
 
-    private void sendMessage(MessageDto messageDto, VoidParamsActionFunctional<Message, Conversation> ok, VoidActionFunctional emptyMessageDto, VoidActionFunctional noConversation) {
+    private void sendMessage(MessageDto messageDto, VoidParamsActionFunctional<Message, Conversation> ok,
+                             VoidActionFunctional emptyMessageDto, VoidActionFunctional noConversation) {
         if(isEmpty(messageDto)) {
             emptyMessageDto.action();
             return;

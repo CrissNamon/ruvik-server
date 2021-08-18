@@ -49,10 +49,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return getUserDetails().getUser().getId();
     }
 
-    public String getUserLogin() {
-        return getUserDetails().getUsername();
-    }
-
     public User getUser() {
         return getUserDetails().getUser();
     }

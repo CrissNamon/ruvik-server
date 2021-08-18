@@ -1,9 +1,6 @@
 package ru.kpekepsalt.ruvik.service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import ru.kpekepsalt.ruvik.dto.ConversationDto;
 import ru.kpekepsalt.ruvik.dto.SessionInitialInformationDto;
@@ -20,6 +17,9 @@ import java.util.List;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
+/**
+ * Service for conversation operations
+ */
 @Service
 public class ConversationServiceImpl implements ConversationService {
 
@@ -43,23 +43,8 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public List<Conversation> findByReceiverId(Long id) {
-        return conversationRepository.findByReceiverId(id);
-    }
-
-    @Override
-    public List<Conversation> findBySenderId(Long id) {
-        return conversationRepository.findBySenderId(id);
-    }
-
-    @Override
     public List<Conversation> findByStatusAndReceiverId(ConversationStatus status, Long id) {
         return conversationRepository.findByStatusAndReceiverId(status, id);
-    }
-
-    @Override
-    public List<Conversation> findByStatusAndSenderId(ConversationStatus status, Long id) {
-        return conversationRepository.findByStatusAndSenderId(status, id);
     }
 
     @Override

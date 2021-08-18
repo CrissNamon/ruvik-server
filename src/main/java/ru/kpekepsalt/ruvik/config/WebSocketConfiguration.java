@@ -15,6 +15,9 @@ import java.util.List;
 
 import static ru.kpekepsalt.ruvik.Urls.API_PATH;
 
+/**
+ * Contains configuration for STOMP over Websocket
+ */
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration extends AbstractSecurityWebSocketMessageBrokerConfigurer {

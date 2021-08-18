@@ -1,5 +1,8 @@
 package ru.kpekepsalt.ruvik;
 
+/**
+ * Urls for mapping
+ */
 public interface Urls {
 
     String API = "/api";
