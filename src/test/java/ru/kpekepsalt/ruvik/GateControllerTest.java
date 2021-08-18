@@ -6,7 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.kpekepsalt.ruvik.Utils.StringUtils;
+import ru.kpekepsalt.ruvik.utils.StringUtils;
 import ru.kpekepsalt.ruvik.dto.UserDto;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

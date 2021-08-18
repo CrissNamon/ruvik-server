@@ -1,4 +1,4 @@
-package ru.kpekepsalt.ruvik.Utils;
+package ru.kpekepsalt.ruvik.utils;
 
 import java.math.BigInteger;
 import java.util.Random;

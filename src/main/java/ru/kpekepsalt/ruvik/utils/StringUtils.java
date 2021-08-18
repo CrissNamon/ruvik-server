@@ -1,4 +1,4 @@
-package ru.kpekepsalt.ruvik.Utils;
+package ru.kpekepsalt.ruvik.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

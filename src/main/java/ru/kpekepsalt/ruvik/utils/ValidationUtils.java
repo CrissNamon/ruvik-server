@@ -1,4 +1,4 @@
-package ru.kpekepsalt.ruvik.Utils;
+package ru.kpekepsalt.ruvik.utils;
 
 import javax.validation.Validation;
 import javax.validation.Validator;

@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static ru.kpekepsalt.ruvik.Urls.API_PATH;
-import static ru.kpekepsalt.ruvik.Utils.ValidationUtils.isValid;
+import static ru.kpekepsalt.ruvik.utils.ValidationUtils.isValid;
 
 /**
  * Controller for managing conversations

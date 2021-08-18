@@ -3,7 +3,7 @@ package ru.kpekepsalt.ruvik.service.Impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.kpekepsalt.ruvik.Utils.CipherUtils;
+import ru.kpekepsalt.ruvik.utils.CipherUtils;
 import ru.kpekepsalt.ruvik.dto.UserDto;
 import ru.kpekepsalt.ruvik.model.User;
 import ru.kpekepsalt.ruvik.repository.UserRepository;

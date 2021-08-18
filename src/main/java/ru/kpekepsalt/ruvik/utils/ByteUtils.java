@@ -1,4 +1,4 @@
-package ru.kpekepsalt.ruvik.Utils;
+package ru.kpekepsalt.ruvik.utils;
 
 /**
  * Utils to work with bytes
