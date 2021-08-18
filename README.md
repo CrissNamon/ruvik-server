@@ -12,11 +12,5 @@ Server app for **Ruvik** messenger, uses:
 <br>To run in docker container use command:
 <br>
 <code>
-docker-compose up -d
-</code>
-
-<br>To rebuild project in container use:
-<br>
-<code>
-    docker-compose build
+docker-compose up -d --build
 </code>
