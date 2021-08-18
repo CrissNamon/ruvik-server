@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM oraclelinux:8-slim
-
+FROM oraclelinux:8-slim as base
 RUN set -eux; \
 	microdnf install \
 		gzip \
@@ -100,4 +99,4 @@ RUN ./mvnw dependency:go-offline
 
 COPY src ./src
 
-CMD ["./mvnw", "spring-boot:run"]
+CMD ["./mvnw", "test", "spring-boot:run"]

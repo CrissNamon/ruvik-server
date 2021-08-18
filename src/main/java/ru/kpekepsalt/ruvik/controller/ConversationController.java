@@ -18,9 +18,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static ru.kpekepsalt.ruvik.Urls.API_PATH;
 
 @RestController
-@RequestMapping("/api/v1/conversation")
+@RequestMapping(API_PATH+"/conversation")
 public class ConversationController {
 
     @Autowired
@@ -39,7 +40,6 @@ public class ConversationController {
     public ResponseEntity<List<Conversation>> getPendingConversations() {
         Long id = userDetailsService.getUserid();
         List<Conversation> pendingConversations = conversationService.findByStatusAndReceiverId(ConversationStatus.PENDING, id);
-        //pendingConversations.addAll(conversationService.findByStatusAndSenderId(ConversationStatus.PENDING, id));
         return ResponseEntity.ok(pendingConversations);
     }
 

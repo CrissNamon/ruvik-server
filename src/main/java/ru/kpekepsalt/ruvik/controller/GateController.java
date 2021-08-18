@@ -4,14 +4,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.kpekepsalt.ruvik.Urls;
 import ru.kpekepsalt.ruvik.dto.UserDto;
 import ru.kpekepsalt.ruvik.model.User;
 import ru.kpekepsalt.ruvik.service.UserService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static ru.kpekepsalt.ruvik.Urls.API_PATH;
+import static ru.kpekepsalt.ruvik.Utils.ValidationUtils.isValid;
 
 @RestController
-@RequestMapping("/api/v1/gate")
+@RequestMapping(API_PATH+ Urls.GATE.END_POINT)
 public class GateController {
 
     @Autowired
@@ -29,10 +35,10 @@ public class GateController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/auth-token/{token}")
-    public ResponseEntity<User> authUserByToken(@PathVariable("token") String token) {
+    @GetMapping("/auth/{token}")
+    public ResponseEntity<User> authUserByToken(@Valid @NotNull @PathVariable("token") String token) {
         if(isEmpty(token)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new User());
         }
         User user = userService.findByToken(token);
         if(isEmpty(user)) {
@@ -45,8 +51,8 @@ public class GateController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody UserDto userDto) {
-        if(isEmpty(userDto)) {
+    public ResponseEntity<User> registerUser(@NotNull @Valid @RequestBody UserDto userDto) {
+        if(isValid(userDto)) {
             return ResponseEntity.badRequest().build();
         }
         User user = userService.findByLogin(userDto.getLogin());

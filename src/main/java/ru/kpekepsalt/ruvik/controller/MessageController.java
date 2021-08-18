@@ -37,7 +37,6 @@ public class MessageController {
 
     @MessageMapping("/send")
     public void processMessage(@Payload NetworkMessageDto networkMessageDto, @Header("Authorization") String token) {
-        System.out.println("STOMP MESSAGE RECEIVED");
         User user = userService.findByToken(token);
         if(isEmpty(user)) {
             return;

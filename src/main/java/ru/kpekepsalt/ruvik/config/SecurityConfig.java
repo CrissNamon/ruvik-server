@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/v1/gate/auth/register").anonymous()
+                .antMatchers("/api/v1/gate/register").anonymous()
                 .antMatchers("/api/v1/gate/auth").authenticated()
                 .antMatchers("/api/v1/gate/auth-token").anonymous()
                 .antMatchers("/api/v1/conversation/**").authenticated()

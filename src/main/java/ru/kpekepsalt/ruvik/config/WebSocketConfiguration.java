@@ -13,21 +13,23 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 import java.util.List;
 
+import static ru.kpekepsalt.ruvik.Urls.API_PATH;
+
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration extends AbstractSecurityWebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/api/v1/message");
-        registry.setApplicationDestinationPrefixes("/api/v1/message/service");
-        registry.setUserDestinationPrefix("/api/v1/message/user");
+        registry.enableSimpleBroker(API_PATH+"/message");
+        registry.setApplicationDestinationPrefixes(API_PATH+"/message/service");
+        registry.setUserDestinationPrefix(API_PATH+"/message/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-                .addEndpoint("/api/v1/message/connect")
+                .addEndpoint(API_PATH+"/message/connect")
                 .setAllowedOrigins("*");
     }
 

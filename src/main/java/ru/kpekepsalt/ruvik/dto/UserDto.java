@@ -2,14 +2,31 @@ package ru.kpekepsalt.ruvik.dto;
 
 import ru.kpekepsalt.ruvik.model.User;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class UserDto {
 
     private Long id;
+
     private String publicIdentityKey;
+
+    @NotNull
+    @NotEmpty
     private String publicIdentityA;
+
+    @NotNull
+    @NotEmpty
     private String publicIdentityB;
+
+    @NotEmpty
+    @NotNull
     private String login;
+
+    @NotNull
+    @NotEmpty
     private String password;
+
     private String databaseKey;
     private String oldDatabaseKey;
     private String token;
