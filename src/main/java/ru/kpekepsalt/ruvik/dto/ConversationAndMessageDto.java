@@ -1,6 +1,6 @@
-package ru.kpekepsalt.ruvik.model;
+package ru.kpekepsalt.ruvik.dto;
 
-public class ConversationAndMessage {
+public class ConversationAndMessageDto {
     private Long conversationId;
     private Long messageId;
 

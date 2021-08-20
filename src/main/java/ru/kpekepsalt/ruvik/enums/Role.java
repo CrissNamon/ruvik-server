@@ -1,4 +1,4 @@
-package ru.kpekepsalt.ruvik.model;
+package ru.kpekepsalt.ruvik.enums;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 

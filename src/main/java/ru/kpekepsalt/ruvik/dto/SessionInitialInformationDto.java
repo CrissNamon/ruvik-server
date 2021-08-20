@@ -1,9 +1,16 @@
 package ru.kpekepsalt.ruvik.dto;
 
+import javax.validation.constraints.NotBlank;
+
 public class SessionInitialInformationDto {
 
+    @NotBlank(message = "Public identity key can't be empty")
     private String publicIdentityKey;
+
+    @NotBlank(message = "Session key can't be empty")
     private String encryptedSessionKey;
+
+    @NotBlank(message = "One-time key can't be empty")
     private String oneTImeKey;
 
     public String getPublicIdentityKey() {

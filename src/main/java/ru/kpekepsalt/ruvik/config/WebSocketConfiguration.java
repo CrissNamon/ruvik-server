@@ -13,7 +13,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 import java.util.List;
 
-import static ru.kpekepsalt.ruvik.Urls.API_PATH;
+import static ru.kpekepsalt.ruvik.Urls.*;
 
 /**
  * Contains configuration for STOMP over Websocket
@@ -24,15 +24,15 @@ public class WebSocketConfiguration extends AbstractSecurityWebSocketMessageBrok
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker(API_PATH+"/message");
-        registry.setApplicationDestinationPrefixes(API_PATH+"/message/service");
-        registry.setUserDestinationPrefix(API_PATH+"/message/user");
+        registry.enableSimpleBroker(API_PATH + MESSAGE.END_POINT);
+        registry.setApplicationDestinationPrefixes(API_PATH + MESSAGE.END_POINT + MESSAGE.SERVICE);
+        registry.setUserDestinationPrefix(API_PATH + MESSAGE.END_POINT + MESSAGE.USER);
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-                .addEndpoint(API_PATH+"/message/connect")
+                .addEndpoint(API_PATH + MESSAGE.END_POINT + MESSAGE.CONNECT)
                 .setAllowedOrigins("*");
     }
 

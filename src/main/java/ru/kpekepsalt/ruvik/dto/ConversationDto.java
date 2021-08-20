@@ -1,9 +1,10 @@
 package ru.kpekepsalt.ruvik.dto;
 
+import ru.kpekepsalt.ruvik.enums.ConversationStatus;
 import ru.kpekepsalt.ruvik.model.Conversation;
-import ru.kpekepsalt.ruvik.model.ConversationStatus;
 
 public class ConversationDto{
+
     private Long conversationId;
     private String sessionKey;
     private Long receiverId;

@@ -7,7 +7,7 @@ import ru.kpekepsalt.ruvik.dto.SessionInitialInformationDto;
 import ru.kpekepsalt.ruvik.functional.VoidActionFunctional;
 import ru.kpekepsalt.ruvik.functional.VoidParamActionFunctional;
 import ru.kpekepsalt.ruvik.model.Conversation;
-import ru.kpekepsalt.ruvik.model.ConversationStatus;
+import ru.kpekepsalt.ruvik.enums.ConversationStatus;
 import ru.kpekepsalt.ruvik.model.User;
 import ru.kpekepsalt.ruvik.repository.ConversationRepository;
 import ru.kpekepsalt.ruvik.service.ConversationService;

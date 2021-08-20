@@ -3,11 +3,15 @@ package ru.kpekepsalt.ruvik.service.Impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.kpekepsalt.ruvik.exception.DataValidityException;
+import ru.kpekepsalt.ruvik.objects.ValidationResult;
 import ru.kpekepsalt.ruvik.utils.CipherUtils;
 import ru.kpekepsalt.ruvik.dto.UserDto;
 import ru.kpekepsalt.ruvik.model.User;
 import ru.kpekepsalt.ruvik.repository.UserRepository;
 import ru.kpekepsalt.ruvik.service.UserService;
+
+import static ru.kpekepsalt.ruvik.utils.ValidationUtils.validate;
 
 /**
  * Service for user profile operations
@@ -29,16 +33,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository
+                .findById(id)
+                .orElse(null);
     }
 
     @Override
-    public void save(User user) {
+    public void save(User user) throws DataValidityException {
+        ValidationResult validationResult = validate(user);
+        if(!validationResult.isValid()) {
+            throw new DataValidityException(
+                    validationResult.getFirstErrorMessage()
+            );
+        }
         userRepository.save(user);
     }
 
     @Override
-    public User createUser(UserDto userDto) {
+    public User createUser(UserDto userDto) throws DataValidityException{
+        ValidationResult validationResult = validate(userDto);
+        if(!validationResult.isValid())
+        {
+            throw new DataValidityException(
+                    validationResult.getFirstErrorMessage()
+            );
+        }
         User user = new User(userDto);
         user.setPassword(
                 passwordEncoder.encode(userDto.getPassword())
@@ -56,7 +75,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User updateUser(User user) throws DataValidityException{
+        ValidationResult validationResult = validate(user);
+        if(!validationResult.isValid()) {
+            throw new DataValidityException(
+                    validationResult.getFirstErrorMessage()
+            );
+        }
         user.setToken(
                 CipherUtils.randomStringKey(TOKEN_LENGTH)
         );

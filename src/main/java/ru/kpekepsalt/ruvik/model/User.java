@@ -2,8 +2,10 @@ package ru.kpekepsalt.ruvik.model;
 
 import org.springframework.stereotype.Component;
 import ru.kpekepsalt.ruvik.dto.UserDto;
+import ru.kpekepsalt.ruvik.enums.Role;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity(name = "appuser")
 @Component
@@ -14,9 +16,11 @@ public class User {
     private Long id;
 
     @Column(name = "login")
+    @NotBlank(message = "User login can't be empty")
     private String login;
 
     @Column(name = "password")
+    @NotBlank(message = "User password can't be empty")
     private String password;
 
     @Column(name = "token")

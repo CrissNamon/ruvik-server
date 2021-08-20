@@ -1,6 +1,7 @@
 package ru.kpekepsalt.ruvik.service;
 
 import ru.kpekepsalt.ruvik.dto.UserDto;
+import ru.kpekepsalt.ruvik.exception.DataValidityException;
 import ru.kpekepsalt.ruvik.model.User;
 
 
@@ -17,14 +18,14 @@ public interface UserService {
      * Saves user data
      * @param user User data to save
      */
-    void save(User user);
+    void save(User user) throws DataValidityException;
 
     /**
      * Creates user profile
      * @param userDto User information
      * @return Saved user profile data
      */
-    User createUser(UserDto userDto);
+    User createUser(UserDto userDto) throws DataValidityException;
 
     /**
      * Searches for user with given login
@@ -38,7 +39,7 @@ public interface UserService {
      * @param user User profile data
      * @return Updated user profile data
      */
-    User updateUser(User user);
+    User updateUser(User user) throws DataValidityException;
 
     /**
      * Searches for user with given token

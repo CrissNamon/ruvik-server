@@ -2,8 +2,7 @@ package ru.kpekepsalt.ruvik.dto;
 
 import ru.kpekepsalt.ruvik.model.User;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 public class UserDto {
 
@@ -11,20 +10,16 @@ public class UserDto {
 
     private String publicIdentityKey;
 
-    @NotNull
-    @NotEmpty
+    @NotBlank(message = "Public key A can't be empty")
     private String publicIdentityA;
 
-    @NotNull
-    @NotEmpty
+    @NotBlank(message = "Public key B can't be empty")
     private String publicIdentityB;
 
-    @NotEmpty
-    @NotNull
+    @NotBlank(message = "User login can't be empty")
     private String login;
 
-    @NotNull
-    @NotEmpty
+    @NotBlank(message = "User password can't be empty")
     private String password;
 
     private String databaseKey;

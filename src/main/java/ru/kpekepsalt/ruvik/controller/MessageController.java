@@ -22,6 +22,7 @@ import ru.kpekepsalt.ruvik.service.UserService;
 import java.time.LocalDateTime;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static ru.kpekepsalt.ruvik.Urls.*;
 
 /**
  * Controller for realtime messaging using STOMP over Websocket
@@ -45,7 +46,7 @@ public class MessageController {
      * @param networkMessageDto Incoming message information
      * @param token User token
      */
-    @MessageMapping("/send")
+    @MessageMapping(MESSAGE.SEND)
     public void processMessage(@Payload NetworkMessageDto networkMessageDto, @Header("Authorization") String token) {
         User user = userService.findByToken(token);
         if(isEmpty(user)) {

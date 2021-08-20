@@ -1,15 +1,15 @@
 package ru.kpekepsalt.ruvik.dto;
 
-public class Response<V> {
+public class ResponseDto<V> {
 
     private String message;
     private V response;
 
-    public Response(String message) {
+    public ResponseDto(String message) {
         this.message = message;
     }
 
-    public Response(String message, V response)
+    public ResponseDto(String message, V response)
     {
         this.message = message;
         this.response = response;

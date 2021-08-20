@@ -3,29 +3,36 @@ package ru.kpekepsalt.ruvik.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kpekepsalt.ruvik.dto.*;
+import ru.kpekepsalt.ruvik.enums.ConversationStatus;
 import ru.kpekepsalt.ruvik.model.*;
+import ru.kpekepsalt.ruvik.objects.ValidationResult;
 import ru.kpekepsalt.ruvik.service.ConversationService;
 import ru.kpekepsalt.ruvik.service.Impl.UserDetailsServiceImpl;
 import ru.kpekepsalt.ruvik.service.MessageService;
 import ru.kpekepsalt.ruvik.service.UserService;
 
-import javax.validation.Valid;
+import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static ru.kpekepsalt.ruvik.Urls.API_PATH;
+import static ru.kpekepsalt.ruvik.Urls.*;
 import static ru.kpekepsalt.ruvik.utils.ValidationUtils.isValid;
+import static ru.kpekepsalt.ruvik.utils.ValidationUtils.validate;
 
 /**
  * Controller for managing conversations
  */
 @RestController
-@RequestMapping(API_PATH+"/conversation")
+@RequestMapping(API_PATH + CONVERSATION.END_POINT)
+@Validated
 public class ConversationController {
 
     @Autowired
@@ -43,12 +50,12 @@ public class ConversationController {
     /**
      * @return List of pending conversations
      */
-    @GetMapping("/pending")
-    public ResponseEntity<Response<List<Conversation>>> getPendingConversations() {
+    @GetMapping(CONVERSATION.PENDING)
+    public ResponseEntity<ResponseDto<List<Conversation>>> getPendingConversations() {
         Long id = userDetailsService.getUserid();
         List<Conversation> pendingConversations = conversationService.findByStatusAndReceiverId(ConversationStatus.PENDING, id);
         return ResponseEntity.ok(
-                new Response<>("", pendingConversations)
+                new ResponseDto<>("", pendingConversations)
         );
     }
 
@@ -58,27 +65,28 @@ public class ConversationController {
      * HTTP 400 - Request error
      * HTTP 404 - User with given login not found
      */
-    @GetMapping("/initiate/{login}")
-    public ResponseEntity<Response<UserDto>> findUserByLogin(@NotBlank @Valid @PathVariable("login") String login) {
+    @GetMapping(CONVERSATION.INITIATE + "/{login}")
+    public ResponseEntity<ResponseDto<UserDto>> findUserByLogin(
+            @PathVariable("login") @NotBlank(message = "User login can't be null") String login) {
         if(isEmpty(login)) {
             return ResponseEntity.badRequest().body(
-                    new ErrorResponse("Login required")
+                    new ErrorResponseDto<>("Login required")
             );
         }
         User user = userService.findByLogin(login);
         if(isEmpty(user)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ErrorResponse("User not found")
+                    new ErrorResponseDto<>("User not found")
             );
         }
         if(user.getId().equals(userDetailsService.getUserid())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    new ErrorResponse("Given id belongs to you! -_-")
+                    new ErrorResponseDto<>("Given id belongs to you! -_-")
             );
         }
         UserDto dto = new UserDto(user);
         return ResponseEntity.ok(
-                new Response<>("", dto)
+                new ResponseDto<>("", dto)
         );
     }
 
@@ -90,33 +98,35 @@ public class ConversationController {
      * HTTP 404 - User with given login not found
      * HTTP 302 - Session has been already initiated
      */
-    @PostMapping("/initiate/{login}")
-    public ResponseEntity<Response<ConversationDto>> createPendingSession(@PathVariable("login") String login,
-                                                                          @RequestBody SessionInitialInformationDto sessionInitialInformationDto) {
+    @PostMapping(CONVERSATION.INITIATE + "/{login}")
+    public ResponseEntity<ResponseDto<ConversationDto>>
+    createPendingSession(@PathVariable("login") @NotBlank(message = "User login can't be null") String login,
+                         @RequestBody SessionInitialInformationDto sessionInitialInformationDto) {
         if(isEmpty(login)) {
             return ResponseEntity.badRequest().body(
-                    new ErrorResponse("Login required")
+                    new ErrorResponseDto<>("Login required")
             );
         }
-        if(!isValid(sessionInitialInformationDto)) {
+        ValidationResult validationResult = validate(sessionInitialInformationDto);
+        if(!validationResult.isValid()) {
             return ResponseEntity.badRequest().body(
-                    new ErrorResponse("Session information is invalid")
+                    new ErrorResponseDto<>(validationResult.getFirstErrorMessage())
             );
         }
-        AtomicReference<ResponseEntity<Response<ConversationDto>>> response = new AtomicReference<>();
+        AtomicReference<ResponseEntity<ResponseDto<ConversationDto>>> response = new AtomicReference<>();
         conversationService.initiate(login, sessionInitialInformationDto,
                 () -> response.set(
                         ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                new ErrorResponse("User not found")
+                                new ErrorResponseDto<>("User not found")
                         )
                 ),
                 () -> response.set(
                         ResponseEntity.status(HttpStatus.FOUND).body(
-                                new ErrorResponse("Session has been already initiated")
+                                new ErrorResponseDto<>("Session has been already initiated")
                         )
                 ),
                 conversation -> response.set(
-                        ResponseEntity.ok(new Response<>("", conversation))
+                        ResponseEntity.ok(new ResponseDto<>("", conversation))
                 ));
         return response.get();
     }
@@ -125,8 +135,9 @@ public class ConversationController {
      * @param ids Identifiers of sessions to accept
      * @return HTTP 200 - List of accepted conversations
      */
-    @PostMapping("/initiate/accept")
-    public ResponseEntity<Response<List<ConversationDto>>> acceptPendingSessions(@RequestBody Long[] ids) {
+    @PostMapping(CONVERSATION.INITIATE + CONVERSATION.ACCEPT)
+    public ResponseEntity<ResponseDto<List<ConversationDto>>> acceptPendingSessions(
+            @RequestBody @NotEmpty(message = "List can't be null") Long[] ids) {
         if(isEmpty(ids)) {
             return ResponseEntity.badRequest().build();
         }
@@ -140,7 +151,7 @@ public class ConversationController {
             accepted.add(conversationDto);
         }
         return ResponseEntity.ok(
-                new Response<>("", accepted)
+                new ResponseDto<>("", accepted)
         );
     }
 
@@ -151,11 +162,12 @@ public class ConversationController {
      * HTTP 202 - Session has been already established
      * HTTP 302 - COnversation already created
      */
-    @PostMapping("/initiate/{id}/accept")
-    public ResponseEntity<Response<ConversationDto>> acceptPendingSession(@PathVariable("id") Long id) {
+    @PostMapping(CONVERSATION.INITIATE + "/{id}" + CONVERSATION.ACCEPT)
+    public ResponseEntity<ResponseDto<ConversationDto>> acceptPendingSession(
+            @PathVariable("id") @Min(value = 0, message = "Id must be greater than 0") Long id) {
         if(isEmpty(id)) {
             return ResponseEntity.badRequest().body(
-                    new ErrorResponse("Session id required")
+                    new ErrorResponseDto<>("Session id required")
             );
         }
         Conversation conversation = conversationService.findById(id);
@@ -168,16 +180,16 @@ public class ConversationController {
                 conversationService.save(response);
             }else{
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-                        new ErrorResponse("Session has been already established")
+                        new ErrorResponseDto<>("Session has been already established")
                 );
             }
         }else{
             return ResponseEntity.status(HttpStatus.FOUND).body(
-                    new ErrorResponse("Conversation has been already created")
+                    new ErrorResponseDto<>("Conversation has been already created")
             );
         }
         return ResponseEntity.ok(
-                new Response<>("", dto)
+                new ResponseDto<>("", dto)
         );
     }
 
@@ -185,13 +197,14 @@ public class ConversationController {
      * @param data List of conversations and messages offset
      * @return HTTP 200 - List of new messages starting from given offset
      */
-    @PostMapping("/message/new")
-    public ResponseEntity<Response<List<Message>>> getNewMessages(@RequestBody List<ConversationAndMessage> data) {
+    @PostMapping(CONVERSATION.MESSAGE + CONVERSATION.NEW)
+    public ResponseEntity<ResponseDto<List<Message>>> getNewMessages(
+            @RequestBody @NotEmpty(message = "List can't be null") List<ConversationAndMessageDto> data) {
         List<Message> messages = new ArrayList<>();
         if(isEmpty(data)) {
-            ResponseEntity.ok(new Response<>("", messages));
+            ResponseEntity.ok(new ResponseDto<>("", messages));
         }
-        for(ConversationAndMessage item : data) {
+        for(ConversationAndMessageDto item : data) {
             List<Message> newMsgs = messageService.findByIdGreaterThan(item.getConversationId(), item.getMessageId());
             Conversation conversation = conversationService.findById(item.getConversationId());
             Message first = newMsgs.stream().findFirst().orElse(null);
@@ -205,7 +218,16 @@ public class ConversationController {
                 messages.addAll(newMsgs);
             }
         }
-        return ResponseEntity.ok(new Response<>("", messages));
+        return ResponseEntity.ok(new ResponseDto<>("", messages));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponseDto<Exception>> handleConstraintViolationException(ConstraintViolationException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        new ErrorResponseDto<>(e.getMessage())
+                );
     }
 
 }

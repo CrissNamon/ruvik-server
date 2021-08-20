@@ -1,5 +1,7 @@
 package ru.kpekepsalt.ruvik.model;
 
+import ru.kpekepsalt.ruvik.enums.ConversationStatus;
+
 import javax.persistence.*;
 
 @Entity

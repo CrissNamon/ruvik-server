@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kpekepsalt.ruvik.service.Impl.UserDetailsServiceImpl;
 
+import static ru.kpekepsalt.ruvik.Urls.*;
 /**
  * Contains configuration for SPring Security
  */
@@ -28,10 +29,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/v1/gate/register").anonymous()
-                .antMatchers("/api/v1/gate/auth").authenticated()
-                .antMatchers("/api/v1/gate/auth-token").anonymous()
-                .antMatchers("/api/v1/conversation/**").authenticated()
+                .antMatchers(API_PATH + GATE.END_POINT + GATE.REGISTER).anonymous()
+                .antMatchers(API_PATH + GATE.END_POINT + GATE.AUTH).authenticated()
+                .antMatchers(API_PATH + GATE.END_POINT + "/**").anonymous()
+                .antMatchers(API_PATH + CONVERSATION.END_POINT + "/**").authenticated()
                 .and()
                 .httpBasic();
     }
