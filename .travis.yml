@@ -11,3 +11,6 @@ notifications:
 
 services:
   - postgresql
+
+before_install:
+  - psql -c 'create database ruvik;' -U postgres
