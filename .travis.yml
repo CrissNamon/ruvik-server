@@ -2,7 +2,12 @@ language: java
 jdk:
   - openjdk11
 
-script: ./mvnw test -B
+env:
+  global:
+    secure: "nrL+JmUd9P96k1AabYXQLhmriSz1NiPhGeGJQg3+MuB2X48ffLoMe3mGu856M8n+qjg+Y9hKQQeUTLFSg4QBfxL4XVy91iaw5iS+RxDOjR1PXcIr7WKe3mod9U4hplLs47bJ9XF6N5EYAop8x24NNG35CPUjlJ9zXW6XpbuNc+GG05HQvNWgv+ZS8Kzfsdl38wZnkg1lOL35c0cE21Soc+F40X3YLbvL06y1P5VLRRm7+9wmL6GWmKrNepo/xkLABZgLdSlu4rg94ZZdIkBcFy0UW69wTnAl42Q0bL+wCL1sVTipedfn4BSQ1+1NwAO4oIQHRE4q2t0F2ibaFemzLzXzCOAv2rUrtX0PCVRpaaXGWxrWy0bOsTzIyITySHPf8KH2fDSejQnkRtK3ipKZrLYpRnZqnYPOLPJHksBiSK6P1yjTBiImgNNy9Pl0gLBJbk0RhnaSai2I+HlbMSyAVbtSoJ4YJR4LUvXb1xyC0ugcVgCRv1VBDtj2TYK2E0NFqj3n5rRDRQrYmEYYd+w6RRu7zxIaLgcJsURS8fa0o97F/sc4uwKqlqboU9Hmvc7OGmeGh9Qdt15FZ7VVhPi87C++exrRElbfdaUaSGwKtmYOPQiq7P7oIHTgTCPc4EmHJjJuH7SdU4AEKQA32QX5VHDmLzpQLqomlx1B8F+bghc="
+
+script:
+  - ./mvnw test javadoc:javadoc -B
 
 notifications:
   email:
@@ -16,3 +21,6 @@ services:
 
 before_install:
   - psql -c 'create database ruvik;' -U postgres
+
+after_success:
+  - .travis/push-javadoc.sh
