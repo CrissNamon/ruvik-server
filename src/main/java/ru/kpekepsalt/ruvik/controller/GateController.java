@@ -9,6 +9,7 @@ import ru.kpekepsalt.ruvik.dto.ErrorResponseDto;
 import ru.kpekepsalt.ruvik.dto.ResponseDto;
 import ru.kpekepsalt.ruvik.dto.UserDto;
 import ru.kpekepsalt.ruvik.exception.DataValidityException;
+import ru.kpekepsalt.ruvik.mapper.UserMapper;
 import ru.kpekepsalt.ruvik.model.User;
 import ru.kpekepsalt.ruvik.objects.ValidationResult;
 import ru.kpekepsalt.ruvik.service.UserService;
@@ -44,7 +45,7 @@ public class GateController {
         try {
             User newUser = userService.updateUser(user);
             userService.save(newUser);
-            UserDto dto = new UserDto(newUser);
+            UserDto dto = UserMapper.INSTANCE.userToDto(newUser);
             return ResponseEntity.ok(
                     new ResponseDto<>("", dto)
             );
@@ -75,7 +76,7 @@ public class GateController {
             User update = userService.updateUser(user);
             update.setOldDatabaseKey(user.getDatabaseKey());
             userService.save(update);
-            UserDto dto = new UserDto(update);
+            UserDto dto = UserMapper.INSTANCE.userToDto(update);
             return ResponseEntity.ok(
                     new ResponseDto<>("", dto)
             );
@@ -109,7 +110,7 @@ public class GateController {
         try {
             user = userService.createUser(userDto);
             userService.save(user);
-            UserDto response = new UserDto(user);
+            UserDto response = UserMapper.INSTANCE.userToDto(user);
             return ResponseEntity.ok(
                     new ResponseDto<>("", response)
             );

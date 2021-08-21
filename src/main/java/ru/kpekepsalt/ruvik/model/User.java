@@ -1,7 +1,6 @@
 package ru.kpekepsalt.ruvik.model;
 
 import org.springframework.stereotype.Component;
-import ru.kpekepsalt.ruvik.dto.UserDto;
 import ru.kpekepsalt.ruvik.enums.Role;
 
 import javax.persistence.*;
@@ -42,14 +41,6 @@ public class User {
     private String oldDatabaseKey;
 
     public User() {}
-
-    public User(UserDto userDto) {
-        this.id = userDto.getId();
-        this.login = userDto.getLogin();
-        this.publicIdentityKeyA = userDto.getPublicIdentityA();
-        this.publicIdentityKeyB = userDto.getPublicIdentityB();
-        this.role = Role.USER;
-    }
 
     public Long getId() {
         return id;
@@ -105,18 +96,6 @@ public class User {
 
     public void setDatabaseKey(String databaseKey) {
         this.databaseKey = databaseKey;
-    }
-
-    public static User copy(User from) {
-        User to = new User();
-        to.setToken(from.getToken());
-        to.setDatabaseKey(from.getDatabaseKey());
-        to.setId(from.getId());
-        to.setPublicIdentityKeyA(from.getPublicIdentityKeyA());
-        to.setPublicIdentityKeyB(from.getPublicIdentityKeyB());
-        to.setLogin(from.getLogin());
-        to.setPassword(from.getPassword());
-        return to;
     }
 
     public String getOldDatabaseKey() {

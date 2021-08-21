@@ -1,14 +1,10 @@
 package ru.kpekepsalt.ruvik.dto;
 
-import ru.kpekepsalt.ruvik.model.User;
-
 import javax.validation.constraints.NotBlank;
 
 public class UserDto {
 
     private Long id;
-
-    private String publicIdentityKey;
 
     @NotBlank(message = "Public key A can't be empty")
     private String publicIdentityA;
@@ -27,17 +23,6 @@ public class UserDto {
     private String token;
 
     public UserDto() {}
-
-    public UserDto(User user) {
-        setId(user.getId());
-        setLogin(user.getLogin());
-        setPassword(user.getPassword());
-        setPublicIdentityA(user.getPublicIdentityKeyA());
-        setPublicIdentityB(user.getPublicIdentityKeyB());
-        setDatabaseKey(user.getDatabaseKey());
-        setOldDatabaseKey(user.getOldDatabaseKey());
-        setToken(user.getToken());
-    }
 
     public Long getId() {
         return id;
@@ -61,14 +46,6 @@ public class UserDto {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPublicIdentityKey() {
-        return publicIdentityKey;
-    }
-
-    public void setPublicIdentityKey(String publicIdentityKey) {
-        this.publicIdentityKey = publicIdentityKey;
     }
 
     public String getDatabaseKey() {

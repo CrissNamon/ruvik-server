@@ -12,6 +12,7 @@ import ru.kpekepsalt.ruvik.enums.NetworkOrigin;
 import ru.kpekepsalt.ruvik.enums.NetworkStatus;
 import ru.kpekepsalt.ruvik.functional.VoidActionFunctional;
 import ru.kpekepsalt.ruvik.functional.VoidParamsActionFunctional;
+import ru.kpekepsalt.ruvik.mapper.MessageMapper;
 import ru.kpekepsalt.ruvik.model.Conversation;
 import ru.kpekepsalt.ruvik.model.Message;
 import ru.kpekepsalt.ruvik.model.User;
@@ -62,7 +63,7 @@ public class MessageController {
                         networkMessageDto.getData(),
                         (message, conversation) -> {
                             Long localId = networkMessageDto.getData().getLocalId();
-                            MessageDto sentMessage = new MessageDto(message);
+                            MessageDto sentMessage = MessageMapper.INSTANCE.messageToDto(message);
                             sentMessage.setUserId(networkMessageDto.getData().getUserId());
                             sentMessage.setSenderLogin(networkMessageDto.getData().getSenderLogin());
                             sentMessage.setTime(LocalDateTime.now());

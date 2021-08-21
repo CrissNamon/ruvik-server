@@ -6,6 +6,7 @@ import ru.kpekepsalt.ruvik.dto.ConversationDto;
 import ru.kpekepsalt.ruvik.dto.SessionInitialInformationDto;
 import ru.kpekepsalt.ruvik.functional.VoidActionFunctional;
 import ru.kpekepsalt.ruvik.functional.VoidParamActionFunctional;
+import ru.kpekepsalt.ruvik.mapper.ConversationMapper;
 import ru.kpekepsalt.ruvik.model.Conversation;
 import ru.kpekepsalt.ruvik.enums.ConversationStatus;
 import ru.kpekepsalt.ruvik.model.User;
@@ -85,7 +86,7 @@ public class ConversationServiceImpl implements ConversationService {
         conversation.setStatus(ConversationStatus.PENDING);
         save(conversation);
         conversation = findBySession(conversation.getSessionKey());
-        ConversationDto dto = new ConversationDto(conversation);
+        ConversationDto dto = ConversationMapper.INSTANCE.conversationToDto(conversation);
         onSuccess.action(dto);
     }
 }

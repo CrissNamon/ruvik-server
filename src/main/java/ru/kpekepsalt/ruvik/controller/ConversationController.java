@@ -7,7 +7,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kpekepsalt.ruvik.dto.*;
 import ru.kpekepsalt.ruvik.enums.ConversationStatus;
-import ru.kpekepsalt.ruvik.model.*;
+import ru.kpekepsalt.ruvik.mapper.CloneMapper;
+import ru.kpekepsalt.ruvik.mapper.ConversationMapper;
+import ru.kpekepsalt.ruvik.mapper.UserMapper;
+import ru.kpekepsalt.ruvik.model.Conversation;
+import ru.kpekepsalt.ruvik.model.Message;
+import ru.kpekepsalt.ruvik.model.User;
 import ru.kpekepsalt.ruvik.objects.ValidationResult;
 import ru.kpekepsalt.ruvik.service.ConversationService;
 import ru.kpekepsalt.ruvik.service.Impl.UserDetailsServiceImpl;
@@ -23,8 +28,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static ru.kpekepsalt.ruvik.Urls.*;
-import static ru.kpekepsalt.ruvik.utils.ValidationUtils.isValid;
+import static ru.kpekepsalt.ruvik.Urls.API_PATH;
+import static ru.kpekepsalt.ruvik.Urls.CONVERSATION;
 import static ru.kpekepsalt.ruvik.utils.ValidationUtils.validate;
 
 /**
@@ -84,7 +89,7 @@ public class ConversationController {
                     new ErrorResponseDto<>("Given id belongs to you! -_-")
             );
         }
-        UserDto dto = new UserDto(user);
+        UserDto dto = UserMapper.INSTANCE.userToDto(user);
         return ResponseEntity.ok(
                 new ResponseDto<>("", dto)
         );
@@ -147,7 +152,7 @@ public class ConversationController {
             if(!isEmpty(conversation)) {
                 conversationService.establishSession(conversation.getId());
             }
-            ConversationDto conversationDto = new ConversationDto(conversation);
+            ConversationDto conversationDto = ConversationMapper.INSTANCE.conversationToDto(conversation);
             accepted.add(conversationDto);
         }
         return ResponseEntity.ok(
@@ -171,10 +176,10 @@ public class ConversationController {
             );
         }
         Conversation conversation = conversationService.findById(id);
-        ConversationDto dto = new ConversationDto(conversation);
+        ConversationDto dto = ConversationMapper.INSTANCE.conversationToDto(conversation);
         if(isEmpty(conversation)) {
             if(conversation.getStatus().equals(ConversationStatus.PENDING)) {
-                Conversation response = conversation.copy(conversation);
+                Conversation response = CloneMapper.INSTANCE.cloneConversation(conversation);
                 response.setStatus(ConversationStatus.ESTABLISHED);
                 response.setOneTimeKey("");
                 conversationService.save(response);

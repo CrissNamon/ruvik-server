@@ -3,7 +3,9 @@ package ru.kpekepsalt.ruvik.service.Impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.kpekepsalt.ruvik.enums.Role;
 import ru.kpekepsalt.ruvik.exception.DataValidityException;
+import ru.kpekepsalt.ruvik.mapper.UserMapper;
 import ru.kpekepsalt.ruvik.objects.ValidationResult;
 import ru.kpekepsalt.ruvik.utils.CipherUtils;
 import ru.kpekepsalt.ruvik.dto.UserDto;
@@ -58,7 +60,8 @@ public class UserServiceImpl implements UserService {
                     validationResult.getFirstErrorMessage()
             );
         }
-        User user = new User(userDto);
+        User user = UserMapper.INSTANCE.dtoToUser(userDto);
+        user.setRole(Role.USER);
         user.setPassword(
                 passwordEncoder.encode(userDto.getPassword())
         );

@@ -76,14 +76,4 @@ public class Conversation {
     public void setOneTimeKey(String oneTImeKey) {
         this.oneTimeKey = oneTImeKey;
     }
-
-    public Conversation copy(Conversation from) {
-        Conversation to = new Conversation();
-        to.setStatus(from.getStatus());
-        to.setSenderId(from.getSenderId());
-        to.setReceiverId(from.getReceiverId());
-        to.setOneTimeKey(from.getOneTimeKey());
-        to.setSessionKey(from.getSessionKey());
-        return to;
-    }
 }

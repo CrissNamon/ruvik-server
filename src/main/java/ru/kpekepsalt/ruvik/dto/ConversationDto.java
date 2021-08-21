@@ -1,7 +1,6 @@
 package ru.kpekepsalt.ruvik.dto;
 
 import ru.kpekepsalt.ruvik.enums.ConversationStatus;
-import ru.kpekepsalt.ruvik.model.Conversation;
 
 public class ConversationDto{
 
@@ -13,15 +12,6 @@ public class ConversationDto{
     private String oneTimeKey;
 
     public ConversationDto() {}
-
-    public ConversationDto(Conversation conversation) {
-        setConversationId(conversation.getId());
-        setSessionKey(conversation.getSessionKey());
-        setReceiverId(conversation.getReceiverId());
-        setSenderId(conversation.getSenderId());
-        setStatus(conversation.getStatus());
-        setOneTimeKey(conversation.getOneTimeKey());
-    }
 
     public Long getConversationId() {
         return conversationId;
