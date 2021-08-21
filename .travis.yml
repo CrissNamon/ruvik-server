@@ -23,4 +23,15 @@ before_install:
   - psql -c 'create database ruvik;' -U postgres
 
 after_success:
-  - .travis/push-javadoc.sh
+  if [ -n "$GITHUB_API_KEY" ]; then
+    cd "$TRAVIS_BUILD_DIR"
+    make docs
+    cp target/site/apidocs docs
+    cd docs
+    git init
+    git checkout -b gh-pages
+    git add .
+    git -c user.name='travis' -c user.email='travis' commit -m init
+    git push -f -q https://CrissNamon:$GITHUB_API_KEY@github.com/CrissNamon/ruvik-server-gh-pages gh-pages &>/dev/null
+    cd "$TRAVIS_BUILD_DIR"
+  fi
