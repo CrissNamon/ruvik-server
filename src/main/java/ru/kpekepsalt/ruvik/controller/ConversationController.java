@@ -153,9 +153,6 @@ public class ConversationController {
     @PostMapping(CONVERSATION.INITIATE + CONVERSATION.ACCEPT)
     public ResponseEntity<ResponseDto<List<ConversationDto>>> acceptPendingSessions(
             @RequestBody @NotEmpty(message = "List can't be null") Long[] ids) {
-        if(isEmpty(ids)) {
-            return ResponseEntity.badRequest().build();
-        }
         List<ConversationDto> accepted = new ArrayList<>();
         for(Long id : ids) {
             Conversation conversation = conversationService.findById(id);
@@ -180,11 +177,6 @@ public class ConversationController {
     @PostMapping(CONVERSATION.INITIATE + "/{id}" + CONVERSATION.ACCEPT)
     public ResponseEntity<ResponseDto<ConversationDto>> acceptPendingSession(
             @PathVariable("id") @Min(value = 0, message = "Id must be greater than 0") Long id) throws DataValidityException {
-        if(isEmpty(id)) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorResponseDto<>("Session id required")
-            );
-        }
         Conversation conversation = conversationService.findById(id);
         ConversationDto dto = ConversationMapper.INSTANCE.conversationToDto(conversation);
         if(isEmpty(conversation)) {
@@ -216,9 +208,6 @@ public class ConversationController {
     public ResponseEntity<ResponseDto<List<Message>>> getNewMessages(
             @RequestBody @NotEmpty(message = "List can't be null") List<ConversationAndMessageDto> data) {
         List<Message> messages = new ArrayList<>();
-        if(isEmpty(data)) {
-            ResponseEntity.ok(new ResponseDto<>("", messages));
-        }
         for(ConversationAndMessageDto item : data) {
             List<Message> newMsgs = messageService.findByIdGreaterThan(item.getConversationId(), item.getMessageId());
             Conversation conversation = conversationService.findById(item.getConversationId());

@@ -65,9 +65,6 @@ public class GateController {
     @GetMapping(GATE.AUTH + "/{token}")
     public ResponseEntity<ResponseDto<UserDto>> authUserByToken(
             @PathVariable("token") @NotBlank(message = "User token can't be empty") String token) {
-        if(isEmpty(token)) {
-            return ResponseEntity.badRequest().build();
-        }
         User user = userService.findByToken(token);
         if(isEmpty(user)) {
             return ResponseEntity.notFound().build();
@@ -124,7 +121,6 @@ public class GateController {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponseDto<Exception>> handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(
