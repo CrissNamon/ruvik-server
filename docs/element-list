@@ -1,0 +1,14 @@
+ru.kpekepsalt.ruvik
+ru.kpekepsalt.ruvik.config
+ru.kpekepsalt.ruvik.controller
+ru.kpekepsalt.ruvik.dto
+ru.kpekepsalt.ruvik.enums
+ru.kpekepsalt.ruvik.exception
+ru.kpekepsalt.ruvik.functional
+ru.kpekepsalt.ruvik.mapper
+ru.kpekepsalt.ruvik.model
+ru.kpekepsalt.ruvik.objects
+ru.kpekepsalt.ruvik.repository
+ru.kpekepsalt.ruvik.service
+ru.kpekepsalt.ruvik.service.Impl
+ru.kpekepsalt.ruvik.utils
