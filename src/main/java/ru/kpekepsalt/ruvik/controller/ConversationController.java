@@ -170,6 +170,7 @@ public class ConversationController {
     /**
      * @param id Identifier of session to accept
      * @return HTTP 200 - Accepted conversation data
+     * @throws DataValidityException if conversation data is invalid
      * HTTP 400 - Request error
      * HTTP 202 - Session has been already established
      * HTTP 302 - COnversation already created

@@ -16,6 +16,7 @@ public interface ConversationService {
      * Saves conversation data
      * @param conversation Conversation to save
      * @return Saved conversation
+     * @throws DataValidityException
      */
     Conversation save(Conversation conversation) throws DataValidityException;
 
