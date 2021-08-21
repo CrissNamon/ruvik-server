@@ -1,3 +1,6 @@
+## RUVIK SERVER
+[![Build Status](https://app.travis-ci.com/CrissNamon/ruvik-server.svg?branch=master)](https://app.travis-ci.com/CrissNamon/ruvik-server)
+<br>
 Server app for **Ruvik** messenger, uses:
 + Spring Boot (Web, Security, Data JPA)
 + Postgres DB
