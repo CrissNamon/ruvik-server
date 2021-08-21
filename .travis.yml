@@ -33,6 +33,6 @@ after_success: |
     git checkout -b apidocs
     git add .
     git -c user.name='travis' -c user.email='travis' commit -m init
-    git push -f -q https://CrissNamon:$GITHUB_API_KEY@github.com/CrissNamon/ruvik-server.git master &>/dev/null
+    git push -f -q https://CrissNamon:$GITHUB_API_KEY@github.com/CrissNamon/ruvik-server.git apidocs &>/dev/null
     cd "$TRAVIS_BUILD_DIR"
   fi

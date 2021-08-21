@@ -22,6 +22,9 @@ public class ValidationUtils {
         validator = validatorFactory.getValidator();
     }
 
+    /**
+     * @return Validation util instance
+     */
     public static ValidationUtils getInstance()
     {
         if(instance == null)
@@ -32,6 +35,7 @@ public class ValidationUtils {
     }
 
     /**
+     * Returns validator object
      * @return Validation API validator instance
      */
     public Validator getValidator() {

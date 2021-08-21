@@ -11,7 +11,7 @@
     <groupId>ru.kpekepsalt</groupId>
     <artifactId>ruvik</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ruvik</name>
+    <name>RUVIK</name>
     <description>Ruvik messenger with Signal protocol</description>
 
     <properties>

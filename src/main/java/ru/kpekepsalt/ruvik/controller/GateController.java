@@ -120,6 +120,10 @@ public class GateController {
         }
     }
 
+    /**
+     * @param e Constraint violation exception object
+     * @return Error response
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponseDto<Exception>> handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
