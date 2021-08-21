@@ -2,6 +2,7 @@ package ru.kpekepsalt.ruvik.service;
 
 import ru.kpekepsalt.ruvik.dto.ConversationDto;
 import ru.kpekepsalt.ruvik.dto.SessionInitialInformationDto;
+import ru.kpekepsalt.ruvik.exception.DataValidityException;
 import ru.kpekepsalt.ruvik.functional.VoidActionFunctional;
 import ru.kpekepsalt.ruvik.functional.VoidParamActionFunctional;
 import ru.kpekepsalt.ruvik.model.Conversation;
@@ -16,7 +17,7 @@ public interface ConversationService {
      * @param conversation Conversation to save
      * @return Saved conversation
      */
-    Conversation save(Conversation conversation);
+    Conversation save(Conversation conversation) throws DataValidityException;
 
     /**
      * Search conversation by session key
@@ -65,5 +66,5 @@ public interface ConversationService {
     void initiate(String login, SessionInitialInformationDto sessionInitialInformationDto,
                   VoidActionFunctional userNotFound,
                   VoidActionFunctional alreadyInitiated,
-                  VoidParamActionFunctional<ConversationDto> onSuccess);
+                  VoidParamActionFunctional<ConversationDto> onSuccess) throws DataValidityException;
 }

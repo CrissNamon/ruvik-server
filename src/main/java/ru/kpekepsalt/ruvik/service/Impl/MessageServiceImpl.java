@@ -29,8 +29,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Conversation haveConversation(Long id) {
-        Conversation conversation = conversationService.findById(id);
-        return conversation;
+        return conversationService.findById(id);
     }
 
     @Override

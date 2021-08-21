@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kpekepsalt.ruvik.dto.*;
 import ru.kpekepsalt.ruvik.enums.ConversationStatus;
+import ru.kpekepsalt.ruvik.exception.DataValidityException;
 import ru.kpekepsalt.ruvik.mapper.CloneMapper;
 import ru.kpekepsalt.ruvik.mapper.ConversationMapper;
 import ru.kpekepsalt.ruvik.mapper.UserMapper;
@@ -107,32 +108,41 @@ public class ConversationController {
     public ResponseEntity<ResponseDto<ConversationDto>>
     createPendingSession(@PathVariable("login") @NotBlank(message = "User login can't be null") String login,
                          @RequestBody SessionInitialInformationDto sessionInitialInformationDto) {
-        if(isEmpty(login)) {
+        if (isEmpty(login)) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponseDto<>("Login required")
             );
         }
         ValidationResult validationResult = validate(sessionInitialInformationDto);
-        if(!validationResult.isValid()) {
+        if (!validationResult.isValid()) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponseDto<>(validationResult.getFirstErrorMessage())
             );
         }
         AtomicReference<ResponseEntity<ResponseDto<ConversationDto>>> response = new AtomicReference<>();
-        conversationService.initiate(login, sessionInitialInformationDto,
-                () -> response.set(
-                        ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                new ErrorResponseDto<>("User not found")
-                        )
-                ),
-                () -> response.set(
-                        ResponseEntity.status(HttpStatus.FOUND).body(
-                                new ErrorResponseDto<>("Session has been already initiated")
-                        )
-                ),
-                conversation -> response.set(
-                        ResponseEntity.ok(new ResponseDto<>("", conversation))
-                ));
+        try {
+            conversationService.initiate(login, sessionInitialInformationDto,
+                    () -> response.set(
+                            ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                                    new ErrorResponseDto<>("User not found")
+                            )
+                    ),
+                    () -> response.set(
+                            ResponseEntity.status(HttpStatus.FOUND).body(
+                                    new ErrorResponseDto<>("Session has been already initiated")
+                            )
+                    ),
+                    conversation -> response.set(
+                            ResponseEntity.ok(new ResponseDto<>("", conversation))
+                    ));
+        } catch (DataValidityException e) {
+            response.set(
+                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(
+                            new ErrorResponseDto<>(e.getMessage())
+                    )
+            );
+        }
         return response.get();
     }
 
@@ -169,7 +179,7 @@ public class ConversationController {
      */
     @PostMapping(CONVERSATION.INITIATE + "/{id}" + CONVERSATION.ACCEPT)
     public ResponseEntity<ResponseDto<ConversationDto>> acceptPendingSession(
-            @PathVariable("id") @Min(value = 0, message = "Id must be greater than 0") Long id) {
+            @PathVariable("id") @Min(value = 0, message = "Id must be greater than 0") Long id) throws DataValidityException {
         if(isEmpty(id)) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponseDto<>("Session id required")
@@ -182,7 +192,7 @@ public class ConversationController {
                 Conversation response = CloneMapper.INSTANCE.cloneConversation(conversation);
                 response.setStatus(ConversationStatus.ESTABLISHED);
                 response.setOneTimeKey("");
-                conversationService.save(response);
+                conversationService.save(conversation);
             }else{
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                         new ErrorResponseDto<>("Session has been already established")
@@ -227,9 +237,16 @@ public class ConversationController {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponseDto<Exception>> handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        new ErrorResponseDto<>(e.getMessage())
+                );
+    }
+
+    @ExceptionHandler(DataValidityException.class)
+    public ResponseEntity<ErrorResponseDto<Exception>> handleDataValidityException(DataValidityException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
                         new ErrorResponseDto<>(e.getMessage())
                 );

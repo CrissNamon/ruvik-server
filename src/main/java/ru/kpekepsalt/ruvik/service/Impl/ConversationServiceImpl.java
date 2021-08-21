@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.kpekepsalt.ruvik.dto.ConversationDto;
 import ru.kpekepsalt.ruvik.dto.SessionInitialInformationDto;
+import ru.kpekepsalt.ruvik.enums.ConversationStatus;
+import ru.kpekepsalt.ruvik.exception.DataValidityException;
 import ru.kpekepsalt.ruvik.functional.VoidActionFunctional;
 import ru.kpekepsalt.ruvik.functional.VoidParamActionFunctional;
 import ru.kpekepsalt.ruvik.mapper.ConversationMapper;
 import ru.kpekepsalt.ruvik.model.Conversation;
-import ru.kpekepsalt.ruvik.enums.ConversationStatus;
 import ru.kpekepsalt.ruvik.model.User;
+import ru.kpekepsalt.ruvik.objects.ValidationResult;
 import ru.kpekepsalt.ruvik.repository.ConversationRepository;
 import ru.kpekepsalt.ruvik.service.ConversationService;
 import ru.kpekepsalt.ruvik.service.UserService;
@@ -17,6 +19,7 @@ import ru.kpekepsalt.ruvik.service.UserService;
 import java.util.List;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static ru.kpekepsalt.ruvik.utils.ValidationUtils.validate;
 
 /**
  * Service for conversation operations
@@ -34,7 +37,13 @@ public class ConversationServiceImpl implements ConversationService {
     private UserDetailsServiceImpl userDetailsService;
 
     @Override
-    public Conversation save(Conversation conversation) {
+    public Conversation save(Conversation conversation) throws DataValidityException {
+        ValidationResult validationResult = validate(conversation);
+        if(!validationResult.isValid()){
+            throw new DataValidityException(
+                    validationResult.getFirstErrorMessage()
+            );
+        }
         return conversationRepository.save(conversation);
     }
 
@@ -63,11 +72,18 @@ public class ConversationServiceImpl implements ConversationService {
         conversationRepository.establishSession(ConversationStatus.ESTABLISHED, id);
     }
 
+    @Override
     public void initiate(String login, SessionInitialInformationDto sessionInitialInformationDto,
                          VoidActionFunctional userNotFound,
                          VoidActionFunctional alreadyInitiated,
-                         VoidParamActionFunctional<ConversationDto> onSuccess)
+                         VoidParamActionFunctional<ConversationDto> onSuccess) throws DataValidityException
     {
+        ValidationResult validationResult = validate(sessionInitialInformationDto);
+        if(!validationResult.isValid()){
+            throw new DataValidityException(
+                    validationResult.getFirstErrorMessage()
+            );
+        }
         User user = userService.findByLogin(login);
         if(isEmpty(user)) {
             userNotFound.action();

@@ -3,6 +3,8 @@ package ru.kpekepsalt.ruvik.model;
 import ru.kpekepsalt.ruvik.enums.ConversationStatus;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Conversation {
@@ -12,12 +14,15 @@ public class Conversation {
     private Long id;
 
     @Column(name = "session_key")
+    @NotBlank(message = "Session key can't be empty")
     private String sessionKey;
 
     @Column(name = "receiver_id")
+    @Min(value = 0, message = "Receiver ID must be greater than zero")
     private Long receiverId;
 
     @Column(name = "sender_id")
+    @Min(value = 0, message = "Sender ID must be greater than zero")
     private Long senderId;
 
     @Column(name = "status")
