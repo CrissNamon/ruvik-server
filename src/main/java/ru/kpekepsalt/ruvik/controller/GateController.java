@@ -37,25 +37,17 @@ public class GateController {
      * @return User information
      */
     @GetMapping(GATE.AUTH)
-    public ResponseEntity<ResponseDto<UserDto>> authUserByLogin() {
-        if(!userService.isAuth()) {
+    public ResponseEntity<ResponseDto<UserDto>> authUserByLogin() throws DataValidityException {
+        if (!userService.isAuth()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         User user = userService.getCurrentUser();
-        try {
-            User newUser = userService.updateUser(user);
-            userService.save(newUser);
-            UserDto dto = UserMapper.INSTANCE.userToDto(newUser);
-            return ResponseEntity.ok(
-                    new ResponseDto<>("", dto)
-            );
-        }catch(DataValidityException e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            new ErrorResponseDto<>(e.getMessage())
-                    );
-        }
+        User newUser = userService.updateUser(user);
+        userService.save(newUser);
+        UserDto dto = UserMapper.INSTANCE.userToDto(newUser);
+        return ResponseEntity.ok(
+                new ResponseDto<>("", dto)
+        );
     }
 
     /**
@@ -64,26 +56,18 @@ public class GateController {
      */
     @GetMapping(GATE.AUTH + "/{token}")
     public ResponseEntity<ResponseDto<UserDto>> authUserByToken(
-            @PathVariable("token") @NotBlank(message = "User token can't be empty") String token) {
+            @PathVariable("token") @NotBlank(message = "User token can't be empty") String token) throws DataValidityException {
         User user = userService.findByToken(token);
-        if(isEmpty(user)) {
+        if (isEmpty(user)) {
             return ResponseEntity.notFound().build();
         }
-        try {
-            User update = userService.updateUser(user);
-            update.setOldDatabaseKey(user.getDatabaseKey());
-            userService.save(update);
-            UserDto dto = UserMapper.INSTANCE.userToDto(update);
-            return ResponseEntity.ok(
-                    new ResponseDto<>("", dto)
-            );
-        }catch(DataValidityException e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            new ErrorResponseDto<>(e.getMessage())
-                    );
-        }
+        User update = userService.updateUser(user);
+        update.setOldDatabaseKey(user.getDatabaseKey());
+        userService.save(update);
+        UserDto dto = UserMapper.INSTANCE.userToDto(update);
+        return ResponseEntity.ok(
+                new ResponseDto<>("", dto)
+        );
     }
 
     /**
@@ -91,9 +75,9 @@ public class GateController {
      * @return Registered user information
      */
     @PostMapping(GATE.REGISTER)
-    public ResponseEntity<ResponseDto<UserDto>> registerUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<ResponseDto<UserDto>> registerUser(@RequestBody UserDto userDto) throws DataValidityException {
         ValidationResult validationResult = validate(userDto);
-        if(!validationResult.isValid()) {
+        if (!validationResult.isValid()) {
             return ResponseEntity
                     .badRequest()
                     .body(
@@ -101,23 +85,15 @@ public class GateController {
                     );
         }
         User user = userService.findByLogin(userDto.getLogin());
-        if(!isEmpty(user)){
+        if (!isEmpty(user)) {
             return ResponseEntity.status(HttpStatus.FOUND).build();
         }
-        try {
-            user = userService.createUser(userDto);
-            userService.save(user);
-            UserDto response = UserMapper.INSTANCE.userToDto(user);
-            return ResponseEntity.ok(
-                    new ResponseDto<>("", response)
-            );
-        }catch(DataValidityException e) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(
-                            new ErrorResponseDto<>(e.getMessage())
-                    );
-        }
+        user = userService.createUser(userDto);
+        userService.save(user);
+        UserDto response = UserMapper.INSTANCE.userToDto(user);
+        return ResponseEntity.ok(
+                new ResponseDto<>("", response)
+        );
     }
 
     /**
@@ -127,6 +103,14 @@ public class GateController {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponseDto<Exception>> handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        new ErrorResponseDto<>(e.getMessage())
+                );
+    }
+
+    @ExceptionHandler(DataValidityException.class)
+    public ResponseEntity<ErrorResponseDto<Exception>> handleDataValidityException(DataValidityException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
                         new ErrorResponseDto<>(e.getMessage())
                 );
