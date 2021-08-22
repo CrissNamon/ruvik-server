@@ -74,18 +74,13 @@ public class ConversationController {
     @GetMapping(CONVERSATION.INITIATE + "/{login}")
     public ResponseEntity<ResponseDto<UserDto>> findUserByLogin(
             @PathVariable("login") @NotBlank(message = "User login can't be null") String login) {
-        if(isEmpty(login)) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorResponseDto<>("Login required")
-            );
-        }
         User user = userService.findByLogin(login);
-        if(isEmpty(user)) {
+        if (isEmpty(user)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ErrorResponseDto<>("User not found")
             );
         }
-        if(user.getId().equals(userDetailsService.getUserid())) {
+        if (user.getId().equals(userDetailsService.getUserid())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     new ErrorResponseDto<>("Given id belongs to you! -_-")
             );
@@ -97,7 +92,7 @@ public class ConversationController {
     }
 
     /**
-     * @param login User login to conversation initiation
+     * @param login                        User login to conversation initiation
      * @param sessionInitialInformationDto Session information for initiation
      * @return HTTP 200 - Initiated conversation data
      * HTTP 400 - Request error
@@ -107,12 +102,7 @@ public class ConversationController {
     @PostMapping(CONVERSATION.INITIATE + "/{login}")
     public ResponseEntity<ResponseDto<ConversationDto>>
     createPendingSession(@PathVariable("login") @NotBlank(message = "User login can't be null") String login,
-                         @RequestBody SessionInitialInformationDto sessionInitialInformationDto) {
-        if (isEmpty(login)) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorResponseDto<>("Login required")
-            );
-        }
+                         @RequestBody SessionInitialInformationDto sessionInitialInformationDto) throws DataValidityException {
         ValidationResult validationResult = validate(sessionInitialInformationDto);
         if (!validationResult.isValid()) {
             return ResponseEntity.badRequest().body(
@@ -120,29 +110,20 @@ public class ConversationController {
             );
         }
         AtomicReference<ResponseEntity<ResponseDto<ConversationDto>>> response = new AtomicReference<>();
-        try {
-            conversationService.initiate(login, sessionInitialInformationDto,
-                    () -> response.set(
-                            ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                    new ErrorResponseDto<>("User not found")
-                            )
-                    ),
-                    () -> response.set(
-                            ResponseEntity.status(HttpStatus.FOUND).body(
-                                    new ErrorResponseDto<>("Session has been already initiated")
-                            )
-                    ),
-                    conversation -> response.set(
-                            ResponseEntity.ok(new ResponseDto<>("", conversation))
-                    ));
-        } catch (DataValidityException e) {
-            response.set(
-                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            new ErrorResponseDto<>(e.getMessage())
-                    )
-            );
-        }
+        conversationService.initiate(login, sessionInitialInformationDto,
+                () -> response.set(
+                        ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                                new ErrorResponseDto<>("User not found")
+                        )
+                ),
+                () -> response.set(
+                        ResponseEntity.status(HttpStatus.FOUND).body(
+                                new ErrorResponseDto<>("Session has been already initiated")
+                        )
+                ),
+                conversation -> response.set(
+                        ResponseEntity.ok(new ResponseDto<>("", conversation))
+                ));
         return response.get();
     }
 
@@ -154,9 +135,9 @@ public class ConversationController {
     public ResponseEntity<ResponseDto<List<ConversationDto>>> acceptPendingSessions(
             @RequestBody @NotEmpty(message = "List can't be null") Long[] ids) {
         List<ConversationDto> accepted = new ArrayList<>();
-        for(Long id : ids) {
+        for (Long id : ids) {
             Conversation conversation = conversationService.findById(id);
-            if(!isEmpty(conversation)) {
+            if (!isEmpty(conversation)) {
                 conversationService.establishSession(conversation.getId());
             }
             ConversationDto conversationDto = ConversationMapper.INSTANCE.conversationToDto(conversation);
@@ -171,27 +152,27 @@ public class ConversationController {
      * @param id Identifier of session to accept
      * @return HTTP 200 - Accepted conversation data
      * @throws DataValidityException if conversation data is invalid
-     * HTTP 400 - Request error
-     * HTTP 202 - Session has been already established
-     * HTTP 302 - COnversation already created
+     *                               HTTP 400 - Request error
+     *                               HTTP 202 - Session has been already established
+     *                               HTTP 302 - COnversation already created
      */
     @PostMapping(CONVERSATION.INITIATE + "/{id}" + CONVERSATION.ACCEPT)
     public ResponseEntity<ResponseDto<ConversationDto>> acceptPendingSession(
             @PathVariable("id") @Min(value = 0, message = "Id must be greater than 0") Long id) throws DataValidityException {
         Conversation conversation = conversationService.findById(id);
         ConversationDto dto = ConversationMapper.INSTANCE.conversationToDto(conversation);
-        if(isEmpty(conversation)) {
-            if(conversation.getStatus().equals(ConversationStatus.PENDING)) {
+        if (isEmpty(conversation)) {
+            if (conversation.getStatus().equals(ConversationStatus.PENDING)) {
                 Conversation response = CloneMapper.INSTANCE.cloneConversation(conversation);
                 response.setStatus(ConversationStatus.ESTABLISHED);
                 response.setOneTimeKey("");
                 conversationService.save(conversation);
-            }else{
+            } else {
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                         new ErrorResponseDto<>("Session has been already established")
                 );
             }
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.FOUND).body(
                     new ErrorResponseDto<>("Conversation has been already created")
             );
@@ -209,17 +190,17 @@ public class ConversationController {
     public ResponseEntity<ResponseDto<List<Message>>> getNewMessages(
             @RequestBody @NotEmpty(message = "List can't be null") List<ConversationAndMessageDto> data) {
         List<Message> messages = new ArrayList<>();
-        for(ConversationAndMessageDto item : data) {
+        for (ConversationAndMessageDto item : data) {
             List<Message> newMsgs = messageService.findByIdGreaterThan(item.getConversationId(), item.getMessageId());
             Conversation conversation = conversationService.findById(item.getConversationId());
             Message first = newMsgs.stream().findFirst().orElse(null);
-            if(first!=null) {
+            if (first != null) {
                 User user = userService.findById(first.getUserId());
                 newMsgs.forEach(message -> message.setSenderLogin(user.getLogin()));
-            }else{
+            } else {
                 continue;
             }
-            if(!isEmpty(newMsgs)) {
+            if (!isEmpty(newMsgs)) {
                 messages.addAll(newMsgs);
             }
         }
